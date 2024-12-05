@@ -22,7 +22,7 @@ export function Popup() {
         }
 
         const result = await browser.storage.local.get("twitchToken");
-        if (result.twitchToken) {
+        if (result.twitchToken && typeof result.twitchToken === "string") {
           setAccessToken(result.twitchToken);
         }
       } catch (err) {
@@ -81,7 +81,6 @@ export function Popup() {
               Logout
             </button>
           </div>
-          <StreamList accessToken={accessToken} />
           <UserProfile accessToken={accessToken} />
         </div>
       )}

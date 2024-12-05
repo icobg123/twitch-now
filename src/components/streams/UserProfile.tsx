@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { fetchUserProfile } from "@src/lib/api/twitch";
 import { FollowedChannels } from "@src/components/streams/FollowedChannels";
+import { UserProfileInfo } from "./UserProfileInfo";
+import { FollowedChannelsSection } from "./FollowedChannelsSection";
 
 type UserProfileProps = {
   accessToken: string;
@@ -15,7 +17,6 @@ export function UserProfile({ accessToken }: UserProfileProps) {
     async function loadUserProfile() {
       try {
         const profileData = await fetchUserProfile(accessToken);
-        console.log('Profile data:', profileData);
         
         if (profileData.data && profileData.data.length > 0) {
           const user = profileData.data[0];
@@ -37,16 +38,8 @@ export function UserProfile({ accessToken }: UserProfileProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="text-sm">
-        {username ? `Logged in as: ${username}` : "Loading user profile..."}
-      </div>
-      
-      {userId && (
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold mb-2">Followed Channels</h2>
-          <FollowedChannels accessToken={accessToken} userId={userId} />
-        </div>
-      )}
+      <UserProfileInfo username={username} />
+      {userId && <FollowedChannelsSection accessToken={accessToken} userId={userId} />}
     </div>
   );
 }
