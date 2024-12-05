@@ -1,0 +1,1 @@
+export const TWITCH_CLIENT_ID = "gqeg1ie6vt78zu88vnq7mke4d3farc"; // Your client ID 
