@@ -22,7 +22,7 @@ export async function fetchFollowedChannels(accessToken: string, userId: string,
   try {
     console.log('Fetching followed channels for user:', userId);
 
-    const url = new URL(`${TWITCH_API_BASE}/channels/followed`);
+    const url = new URL(`${TWITCH_API_BASE}/streams/followed`);
     url.searchParams.append('user_id', userId);
     url.searchParams.append('first', first.toString());
 

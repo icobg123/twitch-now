@@ -1,62 +1,33 @@
 "use client";
 
-import { TwitchAuth } from "@src/components/auth/TwitchAuth";
-import { StreamList } from "@src/components/streams/StreamList";
+import { AlertCircle, LogIn, LogOut, Twitch } from "lucide-react";
 import { UserProfile } from "@src/components/streams/UserProfile";
-import { useEffect, useState } from "react";
-import browser from "webextension-polyfill";
-import { AlertCircle, LogOut, Twitch } from "lucide-react";
-import { fetchUserProfile } from "@src/lib/api/twitch";
+import { useTwitchAuth } from "@src/hooks/useTwitchAuth";
+import { useFollowedLiveStreams } from "@src/hooks/useFollowedLiveStreams";
 
 export function Popup() {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
+  const {
+    accessToken,
+    username,
+    userId,
+    isLoading,
+    error,
+    isAuthenticating,
+    handleLogin,
+    handleLogout,
+    setError,
+  } = useTwitchAuth();
 
-  useEffect(() => {
-    async function checkToken() {
-      try {
-        if (!browser?.storage) {
-          throw new Error("Browser storage API not available");
-        }
-
-        const result = await browser.storage.local.get("twitchToken");
-        if (result.twitchToken && typeof result.twitchToken === "string") {
-          setAccessToken(result.twitchToken);
-          // Fetch username when we have a token
-          const profileData = await fetchUserProfile(result.twitchToken);
-          if (profileData.data && profileData.data.length > 0) {
-            setUsername(profileData.data[0].display_name);
-          }
-        }
-      } catch (err) {
-        setError("Failed to load saved token");
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    checkToken();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      if (!browser?.storage) {
-        throw new Error("Browser storage API not available");
-      }
-      await browser.storage.local.remove("twitchToken");
-      setAccessToken(null);
-      setUsername(null);
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
+  // Only fetch streams if we have both accessToken and userId
+  const { streams, isLoading: isLoadingStreams } = useFollowedLiveStreams(
+    accessToken || "",
+    userId || "",
+    !accessToken || !userId
+  );
 
   if (isLoading) {
     return (
-      <div className="min-h-[200px] grid place-items-center bg-base-200">
+      <div className="grid min-h-[200px] place-items-center bg-base-200">
         <div className="loading loading-spinner loading-lg text-primary"></div>
       </div>
     );
@@ -64,9 +35,9 @@ export function Popup() {
 
   if (error) {
     return (
-      <div className="p-6 flex flex-col items-center gap-4 bg-base-200">
+      <div className="flex flex-col items-center gap-4 bg-base-200 p-6">
         <div className="alert alert-error">
-          <AlertCircle className="h-6 w-6 stroke-current shrink-0" />
+          <AlertCircle className="h-6 w-6 shrink-0 stroke-current" />
           <span>{error}</span>
         </div>
         <button
@@ -80,52 +51,75 @@ export function Popup() {
   }
 
   return (
-    <div className="min-w-[400px] max-h-[600px] overflow-y-auto bg-base-200">
-      {!accessToken ? (
-        <TwitchAuth onAuth={setAccessToken} />
-      ) : (
-        <div className="flex flex-col">
-          <header className="sticky top-0 z-10 bg-base-100 shadow-md">
-            <div className="navbar px-4 py-2">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="avatar placeholder">
-                    <div className="bg-primary text-primary-content rounded-full w-8">
-                      {username ? (
-                        <span className="text-sm font-medium">
-                          {username[0].toUpperCase()}
-                        </span>
-                      ) : (
-                        <Twitch className="h-4 w-4" />
-                      )}
-                    </div>
-                  </div>
-                  <h1 className="text-lg font-semibold">
-                    {username || 'Loading...'}
-                  </h1>
-                </div>
-              </div>
-              <div className="flex-none">
-                <button 
-                  onClick={handleLogout}
-                  className="btn btn-ghost btn-sm gap-2 hover:bg-error/20 hover:text-error"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
+    <div className="flex h-[600px] w-[400px] flex-col bg-base-200">
+      <header className="sticky top-0 z-10 bg-base-100 shadow-md">
+        <div className="navbar px-2 py-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <div className="indicator">
+                {accessToken && !isLoadingStreams && streams.length > 0 && (
+                  <span className="badge indicator-item badge-primary badge-xs">
+                    {streams.length}
+                  </span>
+                )}
+                <button className="btn btn-circle btn-sm btn-ghost">
+                  <Twitch className="h-4 w-4 text-primary" />
                 </button>
               </div>
+              <h1 className="text-lg font-semibold">
+                {accessToken ? username || "Loading..." : "Twitch Live"}
+              </h1>
             </div>
-          </header>
-
-          <main className="p-4">
-            <UserProfile 
-              accessToken={accessToken}
-              username={username}
-              setUsername={setUsername}
-            />
-          </main>
+          </div>
+          <div className="flex-none">
+            {accessToken ? (
+              <button
+                onClick={handleLogout}
+                className="btn btn-ghost btn-sm gap-1 hover:bg-error/20 hover:text-error"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={handleLogin}
+                disabled={isAuthenticating}
+                className="btn btn-primary btn-sm gap-1"
+              >
+                <LogIn className="h-4 w-4" />
+                {isAuthenticating ? "Connecting..." : "Login"}
+              </button>
+            )}
+          </div>
         </div>
-      )}
+      </header>
+      <main className="flex-1 overflow-y-auto p-2">
+        {!accessToken ? (
+          <div className="flex h-full items-center justify-center px-4">
+            <div className="card max-w-sm bg-base-100 shadow-xl">
+              <div className="card-body text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <Twitch className="h-12 w-12 text-primary" />
+                  <div className="space-y-3">
+                    <h2 className="text-xl font-semibold">
+                      Log in with your Twitch account
+                    </h2>
+                    <div className="space-y-2 text-base-content/70">
+                      <p>
+                        Live streams from people you follow will show here once
+                        you're logged in.
+                      </p>
+                      <p>Use the button located in the upper right corner.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <UserProfile accessToken={accessToken} username={username} />
+        )}
+      </main>
     </div>
   );
 }
