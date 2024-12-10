@@ -1,14 +1,35 @@
 import { useState, useMemo } from "react";
 import type { Stream } from "@src/lib/api/twitch";
+import { useFollowedLiveStreams } from "./useFollowedLiveStreams";
+import { useTwitchAuth } from "./useTwitchAuth";
 
 export type SortOption = "viewers-desc" | "viewers-asc" | "started" | "name";
 export type FilterOption = "all" | "gaming";
 
-export function useStreamFilters(streams: Stream[]) {
+export function useStreamFilters() {
   const [sortBy, setSortBy] = useState<SortOption>("viewers-desc");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
 
+  const {
+    accessToken,
+    userId,
+    error: authError
+  } = useTwitchAuth();
+
+  const { 
+    data, 
+    isLoading, 
+    isFetching, 
+    error: streamsError 
+  } = useFollowedLiveStreams(
+    accessToken ?? "", 
+    userId ?? "", 
+    !accessToken || !userId
+  );
+
   const filteredAndSortedStreams = useMemo(() => {
+    const streams = data?.streams ?? [];
+    
     // First apply filters
     let filtered = [...streams];
 
@@ -42,20 +63,18 @@ export function useStreamFilters(streams: Stream[]) {
           return 0;
       }
     });
-  }, [streams, sortBy, filterBy]);
-
-  console.log(
-    "Sorting by:",
-    sortBy,
-    "Filtered streams:",
-    filteredAndSortedStreams
-  );
+  }, [data?.streams, sortBy, filterBy]);
 
   return {
     sortBy,
     filterBy,
     setSortBy,
     setFilterBy,
-    filteredStreams: filteredAndSortedStreams,
+    streams: filteredAndSortedStreams,
+    isLoading,
+    isFetching,
+    error: authError || streamsError,
+    lastUpdated: data?.lastUpdated,
+    isAuthenticated: !!accessToken
   };
 }
