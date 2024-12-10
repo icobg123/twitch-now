@@ -3,6 +3,42 @@ import browser from "webextension-polyfill";
 import { TWITCH_CLIENT_ID } from "@src/lib/constants";
 import { fetchUserProfile } from "@src/lib/api/twitch";
 
+const USER_CACHE_KEY = "twitch-user-cache";
+const USER_CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+type UserCacheData = {
+  username: string;
+  userId: string;
+  timestamp: number;
+};
+
+function getUserCache(): UserCacheData | null {
+  try {
+    const cached = localStorage.getItem(USER_CACHE_KEY);
+    if (!cached) return null;
+
+    const data = JSON.parse(cached) as UserCacheData;
+    const isExpired = Date.now() - data.timestamp > USER_CACHE_EXPIRY;
+
+    return isExpired ? null : data;
+  } catch {
+    return null;
+  }
+}
+
+function setUserCache(username: string, userId: string) {
+  try {
+    const cacheData: UserCacheData = {
+      username,
+      userId,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cacheData));
+  } catch (error) {
+    console.error("Failed to cache user data:", error);
+  }
+}
+
 export function useTwitchAuth() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
@@ -24,11 +60,21 @@ export function useTwitchAuth() {
       const result = await browser.storage.local.get("twitchToken");
       if (result.twitchToken && typeof result.twitchToken === "string") {
         setAccessToken(result.twitchToken);
-        const profileData = await fetchUserProfile(result.twitchToken);
-        if (profileData.data && profileData.data.length > 0) {
-          const user = profileData.data[0];
-          setUsername(user.display_name);
-          setUserId(user.id);
+        
+        // Try to get user data from cache first
+        const cachedUser = getUserCache();
+        if (cachedUser) {
+          setUsername(cachedUser.username);
+          setUserId(cachedUser.userId);
+        } else {
+          // Fetch from API if cache miss or expired
+          const profileData = await fetchUserProfile(result.twitchToken);
+          if (profileData.data && profileData.data.length > 0) {
+            const user = profileData.data[0];
+            setUsername(user.display_name);
+            setUserId(user.id);
+            setUserCache(user.display_name, user.id);
+          }
         }
       }
     } catch (err) {
@@ -95,6 +141,7 @@ export function useTwitchAuth() {
                 const user = profileData.data[0];
                 setUsername(user.display_name);
                 setUserId(user.id);
+                setUserCache(user.display_name, user.id);
               }
             } else {
               setError("Invalid state parameter returned");
@@ -143,6 +190,7 @@ export function useTwitchAuth() {
         throw new Error("Browser storage API not available");
       }
       await browser.storage.local.remove("twitchToken");
+      localStorage.removeItem(USER_CACHE_KEY);
       setAccessToken(null);
       setUsername(null);
       setUserId(null);
