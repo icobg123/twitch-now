@@ -6,18 +6,19 @@ import { type Stream } from "@src/lib/api/twitch";
 type FollowedStreamsViewProps = {
   accessToken: string;
   username: string | null;
+  filteredStreams: Stream[];
 };
 
 export function FollowedStreamsView({
   accessToken,
   username,
+  filteredStreams,
 }: FollowedStreamsViewProps) {
-  const { data, isLoading, isFetching, error } =
-    useFollowedLiveStreams(
-      accessToken ?? "",
-      username ?? "",
-      !accessToken || !username
-    );
+  const { data, isLoading, isFetching, error } = useFollowedLiveStreams(
+    accessToken ?? "",
+    username ?? "",
+    !accessToken || !username
+  );
 
   function formatTime(date: Date) {
     return date.toLocaleTimeString("en-US", {
@@ -40,16 +41,17 @@ export function FollowedStreamsView({
     return <StreamListSkeleton />;
   }
 
-  if (!data?.streams || data.streams.length === 0) {
+  if (filteredStreams.length === 0) {
     return (
       <div className="flex h-full items-center justify-center px-4">
         <div className="text-center">
           <h3 className="text-lg font-semibold">No Live Streams</h3>
           <p className="text-base-content/70">
-            None of the channels you follow are currently live.
+            No streams match the current filters.
           </p>
           <p className="mt-2 text-sm text-base-content/50">
-            Last updated: {formatTime(data?.lastUpdated ?? new Date())} - Updates every 2 minutes
+            Last updated: {formatTime(data?.lastUpdated ?? new Date())} -
+            Updates every 2 minutes
           </p>
         </div>
       </div>
@@ -59,7 +61,7 @@ export function FollowedStreamsView({
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-1.5 p-2">
-        {data.streams.map((stream: Stream) => (
+        {filteredStreams.map((stream: Stream) => (
           <StreamCard key={stream.id} stream={stream} />
         ))}
       </div>
@@ -70,7 +72,7 @@ export function FollowedStreamsView({
             Refreshing...
           </span>
         ) : (
-          `Last updated: ${formatTime(data.lastUpdated)} - Updates every 2 minutes`
+          `Last updated: ${formatTime(data?.lastUpdated ?? new Date())} - Updates every 2 minutes`
         )}
       </div>
     </div>
