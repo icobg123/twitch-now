@@ -139,7 +139,7 @@ export function Popup() {
           <>
             <div className="btm-nav btm-nav-sm bg-base-100 border-t border-base-300">
               <button 
-                className={filterBy === "all" ? "active" : ""}
+                className={`${filterBy === "all" ? "active !bg-primary/10 !text-primary" : ""}`}
                 onClick={() => setFilterBy("all")}
               >
                 <Users className="h-4 w-4" />
@@ -147,21 +147,25 @@ export function Popup() {
               </button>
               
               <button 
-                className={filterBy === "gaming" ? "active" : ""}
+                className={`${filterBy === "gaming" ? "active !bg-primary/10 !text-primary" : ""}`}
                 onClick={() => setFilterBy("gaming")}
               >
                 <Gamepad className="h-4 w-4" />
                 <span className="btm-nav-label text-xs">Gaming</span>
               </button>
 
-              <div className="dropdown dropdown-top dropdown-end"
-                   onBlur={() => setIsSortOpen(false)}
-              >
+              <div className="dropdown dropdown-top dropdown-end">
                 <button 
                   className={`flex h-full w-full flex-col items-center justify-center gap-0.5 ${
-                    isSortOpen ? "!bg-base-300" : sortBy !== "viewers-desc" ? "active" : ""
+                    isSortOpen ? "!bg-primary/10 !text-primary" : 
+                    sortBy !== "viewers-desc" ? "active !bg-primary/10 !text-primary" : ""
                   }`}
                   onClick={() => setIsSortOpen(!isSortOpen)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                      setIsSortOpen(false);
+                    }
+                  }}
                   tabIndex={0}
                 >
                   <ArrowUpDown className={`h-4 w-4 transition-transform ${
@@ -169,16 +173,19 @@ export function Popup() {
                   }`} />
                   <span className="btm-nav-label text-xs">Sort</span>
                 </button>
-                <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 translate-y-[-0.5rem]"
-                    tabIndex={0}
+                <ul 
+                  className={`dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 translate-y-[-0.5rem] ${
+                    isSortOpen ? "" : "hidden"
+                  }`}
+                  tabIndex={0}
                 >
                   <li>
                     <button 
-                      className={sortBy === "viewers-desc" ? "active" : ""} 
+                      className={sortBy === "viewers-desc" ? "active !text-primary" : ""} 
                       onClick={(e) => {
                         e.preventDefault();
-                        console.log('Setting sort to viewers desc');
                         setSortBy("viewers-desc");
+                        setIsSortOpen(false);
                       }}
                     >
                       Viewers (High to Low)
@@ -186,11 +193,11 @@ export function Popup() {
                   </li>
                   <li>
                     <button 
-                      className={sortBy === "viewers-asc" ? "active" : ""} 
+                      className={sortBy === "viewers-asc" ? "active !text-primary" : ""} 
                       onClick={(e) => {
                         e.preventDefault();
-                        console.log('Setting sort to viewers asc');
                         setSortBy("viewers-asc");
+                        setIsSortOpen(false);
                       }}
                     >
                       Viewers (Low to High)
@@ -198,11 +205,11 @@ export function Popup() {
                   </li>
                   <li>
                     <button 
-                      className={sortBy === "started" ? "active" : ""} 
+                      className={sortBy === "started" ? "active !text-primary" : ""} 
                       onClick={(e) => {
                         e.preventDefault();
-                        console.log('Setting sort to started');
                         setSortBy("started");
+                        setIsSortOpen(false);
                       }}
                     >
                       Recently Started
@@ -210,11 +217,11 @@ export function Popup() {
                   </li>
                   <li>
                     <button 
-                      className={sortBy === "name" ? "active" : ""} 
+                      className={sortBy === "name" ? "active !text-primary" : ""} 
                       onClick={(e) => {
                         e.preventDefault();
-                        console.log('Setting sort to name');
                         setSortBy("name");
+                        setIsSortOpen(false);
                       }}
                     >
                       Streamer Name

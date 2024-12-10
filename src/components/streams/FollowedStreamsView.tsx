@@ -61,8 +61,17 @@ export function FollowedStreamsView({
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-1.5 p-2">
-        {filteredStreams.map((stream: Stream) => (
-          <StreamCard key={stream.id} stream={stream} />
+        {filteredStreams.map((stream: Stream, index: number) => (
+          <div
+            key={stream.id}
+            className="animate-fade-up"
+            style={{
+              animationDelay: `${index * 50}ms`,
+              animationFillMode: "forwards",
+            }}
+          >
+            <StreamCard stream={stream} />
+          </div>
         ))}
       </div>
       <div className="border-t border-base-300 bg-base-100/50 p-2 text-center text-sm text-base-content/50">

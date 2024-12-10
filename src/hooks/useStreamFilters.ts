@@ -13,16 +13,12 @@ export function useStreamFilters(streams: Stream[]) {
     let filtered = [...streams];
 
     if (filterBy === "gaming") {
-      filtered = filtered.filter(stream => 
-        stream.game_name && [
-          "Games",
-          "Gaming",
-          "Slots",
-          "Casino",
-          "Sports"
-        ].some(category => 
-          stream.game_name.toLowerCase().includes(category.toLowerCase())
-        )
+      filtered = filtered.filter(
+        (stream) =>
+          stream.game_name &&
+          ["Games", "Gaming", "Slots", "Casino", "Sports"].some((category) =>
+            stream.game_name.toLowerCase().includes(category.toLowerCase())
+          )
       );
     }
 
@@ -35,22 +31,25 @@ export function useStreamFilters(streams: Stream[]) {
           return (a.viewer_count || 0) - (b.viewer_count || 0);
         case "started":
           return (
-            new Date(b.started_at || 0).getTime() - 
+            new Date(b.started_at || 0).getTime() -
             new Date(a.started_at || 0).getTime()
           );
         case "name":
-          return (
-            (a.user_name || "").toLowerCase().localeCompare(
-              (b.user_name || "").toLowerCase()
-            )
-          );
+          return (a.user_name || "")
+            .toLowerCase()
+            .localeCompare((b.user_name || "").toLowerCase());
         default:
           return 0;
       }
     });
   }, [streams, sortBy, filterBy]);
 
-  console.log('Sorting by:', sortBy, 'Filtered streams:', filteredAndSortedStreams);
+  console.log(
+    "Sorting by:",
+    sortBy,
+    "Filtered streams:",
+    filteredAndSortedStreams
+  );
 
   return {
     sortBy,
@@ -59,4 +58,4 @@ export function useStreamFilters(streams: Stream[]) {
     setFilterBy,
     filteredStreams: filteredAndSortedStreams,
   };
-} 
+}
