@@ -5,6 +5,7 @@ import {useTwitchAuth} from "@src/hooks/useTwitchAuth";
 import {FollowedStreamsView} from "@src/components/streams/FollowedStreamsView";
 import {useFollowedLiveStreams} from "@src/hooks/useFollowedLiveStreams";
 import {useStreamFilters} from "@src/hooks/useStreamFilters";
+import {useState} from "react";
 
 export function Popup() {
   const {
@@ -39,6 +40,8 @@ export function Popup() {
     setFilterBy,
     filteredStreams
   } = useStreamFilters(data?.streams ?? []);
+
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
   if (error) {
     return (
@@ -151,14 +154,24 @@ export function Popup() {
                 <span className="btm-nav-label text-xs">Gaming</span>
               </button>
 
-              <div className="dropdown dropdown-top dropdown-end">
-                <button className={`flex h-full w-full flex-col items-center justify-center gap-0.5 ${
-                  sortBy !== "viewers-desc" ? "active" : ""
-                }`}>
-                  <ArrowUpDown className="h-4 w-4" />
+              <div className="dropdown dropdown-top dropdown-end"
+                   onBlur={() => setIsSortOpen(false)}
+              >
+                <button 
+                  className={`flex h-full w-full flex-col items-center justify-center gap-0.5 ${
+                    isSortOpen ? "!bg-base-300" : sortBy !== "viewers-desc" ? "active" : ""
+                  }`}
+                  onClick={() => setIsSortOpen(!isSortOpen)}
+                  tabIndex={0}
+                >
+                  <ArrowUpDown className={`h-4 w-4 transition-transform ${
+                    isSortOpen ? "rotate-180" : ""
+                  }`} />
                   <span className="btm-nav-label text-xs">Sort</span>
                 </button>
-                <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 translate-y-[-0.5rem]">
+                <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 translate-y-[-0.5rem]"
+                    tabIndex={0}
+                >
                   <li>
                     <button 
                       className={sortBy === "viewers-desc" ? "active" : ""} 
