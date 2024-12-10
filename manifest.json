@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "name in manifest.json",
-  "description": "description in manifest.json",
+  "name": "StreamerLens",
+  "description": "Keep track of your favorite Twitch streamers and see when they are live",
   "options_ui": {
     "page": "src/pages/options/index.html"
   },
@@ -39,7 +39,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "twitch-streams@example.com",
+      "id": "streamerlens@example.com",
       "strict_min_version": "109.0"
     }
   }

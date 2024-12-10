@@ -56,17 +56,17 @@ export function UserProfile({ accessToken, username }: UserProfileProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col">
       {/* Debug info */}
       {process.env.NODE_ENV === "development" && (
-        <div className="text-xs text-base-content/50">
+        <div className="mb-6 text-xs text-base-content/50">
           Debug: UserID: {userId || "not set"}, Username:{" "}
           {username || "not set"}
         </div>
       )}
 
       {/* Live Streams Card */}
-      <div className="card bg-base-100 shadow-xl">
+      <div className="mb-6 card bg-base-100 shadow-xl">
         <div className="card-body p-0">
           {userId ? (
             <LiveFollowedStreams accessToken={accessToken} userId={userId} />

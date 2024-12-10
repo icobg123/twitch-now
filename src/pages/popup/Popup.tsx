@@ -1,8 +1,8 @@
 "use client";
 
 import { AlertCircle, LogIn, LogOut, Twitch } from "lucide-react";
-import { UserProfile } from "@src/components/streams/UserProfile";
 import { useTwitchAuth } from "@src/hooks/useTwitchAuth";
+import { FollowedStreamsView } from "@src/components/streams/FollowedStreamsView";
 import { useFollowedLiveStreams } from "@src/hooks/useFollowedLiveStreams";
 
 export function Popup() {
@@ -18,12 +18,7 @@ export function Popup() {
     setError,
   } = useTwitchAuth();
 
-  // Only fetch streams if we have both accessToken and userId
-  const { streams, isLoading: isLoadingStreams } = useFollowedLiveStreams(
-    accessToken || "",
-    userId || "",
-    !accessToken || !userId
-  );
+  const { streams } = useFollowedLiveStreams(accessToken ?? "", userId ?? "", !accessToken || !userId);
 
   if (isLoading) {
     return (
@@ -57,12 +52,12 @@ export function Popup() {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <div className="indicator">
-                {accessToken && !isLoadingStreams && streams.length > 0 && (
+                {accessToken && !isLoading && streams.length > 0 && (
                   <span className="badge indicator-item badge-primary badge-xs">
                     {streams.length}
                   </span>
                 )}
-                <button className="btn btn-circle btn-sm btn-ghost">
+                <button className="btn btn-circle btn-ghost btn-sm">
                   <Twitch className="h-4 w-4 text-primary" />
                 </button>
               </div>
@@ -93,7 +88,7 @@ export function Popup() {
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-y-auto p-2">
+      <main className="flex-1 overflow-y-auto p-0">
         {!accessToken ? (
           <div className="flex h-full items-center justify-center px-4">
             <div className="card max-w-sm bg-base-100 shadow-xl">
@@ -117,7 +112,7 @@ export function Popup() {
             </div>
           </div>
         ) : (
-          <UserProfile accessToken={accessToken} username={username} />
+          <FollowedStreamsView accessToken={accessToken} username={username} />
         )}
       </main>
     </div>

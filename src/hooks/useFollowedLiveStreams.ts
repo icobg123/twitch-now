@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchFollowedChannels } from "@src/lib/api/twitch";
+import { fetchFollowedStreams } from "@src/lib/api/twitch";
 
 type Stream = {
   id: string;
@@ -33,7 +33,7 @@ export function useFollowedLiveStreams(
       
       try {
         setIsLoading(true);
-        const response = await fetchFollowedChannels(accessToken, userId);
+        const response = await fetchFollowedStreams(accessToken, userId);
         setStreams(response.data);
       } catch (err) {
         console.error("Error loading streams:", err);
