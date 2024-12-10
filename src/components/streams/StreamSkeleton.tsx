@@ -1,13 +1,13 @@
 export function StreamSkeleton() {
   return (
-    <div className="flex animate-pulse gap-4 rounded-lg bg-base-100 p-4 shadow-md">
-      <div className="skeleton h-24 w-36 shrink-0 rounded-lg"></div>
-      <div className="flex-1 space-y-3">
-        <div className="skeleton h-4 w-3/4"></div>
-        <div className="skeleton h-3 w-1/2"></div>
-        <div className="flex items-center gap-2">
-          <div className="skeleton h-8 w-8 rounded-full"></div>
-          <div className="skeleton h-3 w-24"></div>
+    <div className="flex gap-3 rounded-lg bg-base-100 p-3 shadow-md">
+      <div className="h-20 w-32 shrink-0 rounded-lg bg-base-300 animate-pulse" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 w-3/4 rounded bg-base-300 animate-pulse" />
+        <div className="h-3 w-1/2 rounded bg-base-300 animate-pulse" />
+        <div className="flex items-center gap-2 mt-1">
+          <div className="h-6 w-6 rounded-full bg-base-300 animate-pulse" />
+          <div className="h-3 w-24 rounded bg-base-300 animate-pulse" />
         </div>
       </div>
     </div>

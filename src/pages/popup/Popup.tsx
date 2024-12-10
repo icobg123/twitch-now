@@ -1,10 +1,9 @@
 "use client";
 
-import { AlertCircle, LogIn, LogOut, Twitch } from "lucide-react";
-import { useTwitchAuth } from "@src/hooks/useTwitchAuth";
-import { FollowedStreamsView } from "@src/components/streams/FollowedStreamsView";
-import { useFollowedLiveStreams } from "@src/hooks/useFollowedLiveStreams";
-import { StreamListSkeleton } from "@src/components/streams/StreamSkeleton";
+import {AlertCircle, LogIn, LogOut, Twitch} from "lucide-react";
+import {useTwitchAuth} from "@src/hooks/useTwitchAuth";
+import {FollowedStreamsView} from "@src/components/streams/FollowedStreamsView";
+import {useFollowedLiveStreams} from "@src/hooks/useFollowedLiveStreams";
 
 export function Popup() {
   const {
@@ -26,12 +25,13 @@ export function Popup() {
     isAuthLoading 
   });
 
-  const { streams, isLoading: isLoadingStreams } = useFollowedLiveStreams(
+  const { data, isLoading: isLoadingStreams } = useFollowedLiveStreams(
     accessToken ?? "",
     userId ?? "",
     !accessToken || !userId
   );
 
+  const streams = data?.streams ?? [];
 
   if (error) {
     return (

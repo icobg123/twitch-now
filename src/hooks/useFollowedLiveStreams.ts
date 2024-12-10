@@ -1,42 +1,72 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchFollowedStreams, type Stream } from "@src/lib/api/twitch";
-import { useState, useEffect } from "react";
+
+const CACHE_KEY = "followed-streams-cache";
+const CACHE_EXPIRY = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+type CacheData = {
+  streams: Stream[];
+  timestamp: number;
+  lastUpdated: Date;
+};
+
+function getCache(): CacheData | null {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+
+    const data = JSON.parse(cached) as CacheData;
+    const isExpired = Date.now() - new Date(data.timestamp).getTime() > CACHE_EXPIRY;
+
+    return isExpired ? null : data;
+  } catch {
+    return null;
+  }
+}
+
+function setCache(streams: Stream[]) {
+  try {
+    const cacheData: CacheData = {
+      streams,
+      timestamp: Date.now(),
+      lastUpdated: new Date()
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+  } catch (error) {
+    console.error("Failed to cache streams:", error);
+  }
+}
 
 export function useFollowedLiveStreams(
   accessToken: string,
   userId: string,
-  skip: boolean
+  isDisabled: boolean
 ) {
-  const queryKey = ["followed-streams", userId];
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-
-  const { data: streams, isLoading, error, isFetching } = useQuery<Stream[], Error>({
-    queryKey,
-    queryFn: () => {
-      console.log('📡 Query function executing');
-      return fetchFollowedStreams(accessToken, userId);
+  return useQuery({
+    queryKey: ["followed-streams", userId],
+    queryFn: async () => {
+      const streams = await fetchFollowedStreams(accessToken, userId);
+      const data = {
+        streams,
+        lastUpdated: new Date()
+      };
+      setCache(streams);
+      return data;
     },
-    enabled: !skip && !!accessToken && !!userId,
-    staleTime: 0,
-    refetchInterval: 2 * 60 * 1000,
-    refetchOnWindowFocus: true,
-    retry: 2,
-    initialData: [],
-    refetchOnMount: true,
+    enabled: !isDisabled && !!accessToken && !!userId,
+    refetchInterval: CACHE_EXPIRY,
+    staleTime: CACHE_EXPIRY,
+    gcTime: CACHE_EXPIRY,
+    initialData: () => {
+      const cached = getCache();
+      return cached ? {
+        streams: cached.streams,
+        lastUpdated: new Date(cached.lastUpdated)
+      } : undefined;
+    },
+    placeholderData: () => ({
+      streams: [],
+      lastUpdated: new Date()
+    })
   });
-
-  // Update lastUpdated whenever streams data changes
-  useEffect(() => {
-    if (!isFetching) {
-      setLastUpdated(new Date());
-    }
-  }, [streams, isFetching]);
-
-  return {
-    streams,
-    isLoading,
-    isFetching,
-    error: error?.message ?? null,
-    lastUpdated,
-  };
 } 
