@@ -29,7 +29,7 @@ export function StreamCard({ stream }: { stream: Stream }) {
             .replace("{height}", "80")}
           alt={stream.title}
           className="h-full w-full object-cover"
-          loading="lazy"
+          fetchPriority="high"
         />
         <div className="absolute bottom-0 left-0 right-0">
           <span className="truncate rounded-tr-lg bg-black/70 p-1 text-sm font-medium text-white">
