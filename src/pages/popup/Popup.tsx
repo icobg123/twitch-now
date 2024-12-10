@@ -4,13 +4,14 @@ import { AlertCircle, LogIn, LogOut, Twitch } from "lucide-react";
 import { useTwitchAuth } from "@src/hooks/useTwitchAuth";
 import { FollowedStreamsView } from "@src/components/streams/FollowedStreamsView";
 import { useFollowedLiveStreams } from "@src/hooks/useFollowedLiveStreams";
+import { StreamListSkeleton } from "@src/components/streams/StreamSkeleton";
 
 export function Popup() {
   const {
     accessToken,
     username,
     userId,
-    isLoading,
+    isLoading: isAuthLoading,
     error,
     isAuthenticating,
     handleLogin,
@@ -18,15 +19,19 @@ export function Popup() {
     setError,
   } = useTwitchAuth();
 
-  const { streams } = useFollowedLiveStreams(accessToken ?? "", userId ?? "", !accessToken || !userId);
+  console.log('🔑 Auth state:', { 
+    hasAccessToken: !!accessToken, 
+    username, 
+    userId, 
+    isAuthLoading 
+  });
 
-  if (isLoading) {
-    return (
-      <div className="grid min-h-[200px] place-items-center bg-base-200">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-      </div>
-    );
-  }
+  const { streams, isLoading: isLoadingStreams } = useFollowedLiveStreams(
+    accessToken ?? "",
+    userId ?? "",
+    !accessToken || !userId
+  );
+
 
   if (error) {
     return (
@@ -52,7 +57,7 @@ export function Popup() {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <div className="indicator">
-                {accessToken && !isLoading && streams.length > 0 && (
+                {accessToken && !isAuthLoading && streams.length > 0 && (
                   <span className="badge indicator-item badge-primary badge-xs">
                     {streams.length}
                   </span>
@@ -112,7 +117,7 @@ export function Popup() {
             </div>
           </div>
         ) : (
-          <FollowedStreamsView accessToken={accessToken} username={username} />
+          <FollowedStreamsView accessToken={accessToken} username={userId} />
         )}
       </main>
     </div>

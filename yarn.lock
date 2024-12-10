@@ -631,6 +631,40 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
+"@tanstack/query-core@5.62.3":
+  version "5.62.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.62.3.tgz#7cfde68f7d78807faebee2a2bb1e31b81067f46b"
+  integrity sha512-Jp/nYoz8cnO7kqhOlSv8ke/0MJRJVGuZ0P/JO9KQ+f45mpN90hrerzavyTKeSoT/pOzeoOUkv1Xd0wPsxAWXfg==
+
+"@tanstack/query-persist-client-core@5.62.3":
+  version "5.62.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.62.3.tgz#bdd54c030d1993664d95e11a8625346e18988b8f"
+  integrity sha512-2cyrQAF1+yn/9GJf3kZnXjtFhlcCWOLL9PXG/JeMxRz8Ni0qvBbRIAXryKVJuDh570K0mmaaGs33pQb+FbmnEQ==
+  dependencies:
+    "@tanstack/query-core" "5.62.3"
+
+"@tanstack/query-sync-storage-persister@^5.62.3":
+  version "5.62.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.62.3.tgz#4aeb9c3871c7790a3de20debb3c0eecb69505eef"
+  integrity sha512-xlFPNfzYgbFAvfxi94HfAS4UfqE4mKgHP7UWmGlRpONJgmKc3iYF1AwCbgKak0f8Hxnl35wjgpHXme1MZWcUgA==
+  dependencies:
+    "@tanstack/query-core" "5.62.3"
+    "@tanstack/query-persist-client-core" "5.62.3"
+
+"@tanstack/react-query-persist-client@^5.62.3":
+  version "5.62.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.62.3.tgz#c8e8dd8ef37b21198581c37848cc017372fb59fc"
+  integrity sha512-MoJzwerYUyjtBclcTcCwOYCfxVwyPKn7nDXNl7yAHlkLDRAJSxMl1bHIYNotIXSqbhenVLk9LICCOTg6RDgMxw==
+  dependencies:
+    "@tanstack/query-persist-client-core" "5.62.3"
+
+"@tanstack/react-query@^5.62.3":
+  version "5.62.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.62.3.tgz#c6766b1764dcf924f6ed5fd88daf8d246e2f5c14"
+  integrity sha512-y2zDNKuhgiuMgsKkqd4AcsLIBiCfEO8U11AdrtAUihmLbRNztPrlcZqx2lH1GacZsx+y1qRRbCcJLYTtF1vKsw==
+  dependencies:
+    "@tanstack/query-core" "5.62.3"
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.11"
   resolved "https://registry.npmjs.org/@tsconfig/node10/-/node10-1.0.11.tgz"

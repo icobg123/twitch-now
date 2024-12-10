@@ -1,50 +1,42 @@
-import { useEffect, useState } from "react";
-import { fetchFollowedStreams } from "@src/lib/api/twitch";
-
-type Stream = {
-  id: string;
-  user_id: string;
-  user_login: string;
-  user_name: string;
-  game_name: string;
-  title: string;
-  viewer_count: number;
-  started_at: string;
-  thumbnail_url: string;
-  tags: string[];
-  is_mature: boolean;
-};
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchFollowedStreams, type Stream } from "@src/lib/api/twitch";
+import { useState, useEffect } from "react";
 
 export function useFollowedLiveStreams(
-  accessToken: string, 
+  accessToken: string,
   userId: string,
-  disabled: boolean = false
+  skip: boolean
 ) {
-  const [streams, setStreams] = useState<Stream[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryKey = ["followed-streams", userId];
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
+  const { data: streams, isLoading, error, isFetching } = useQuery<Stream[], Error>({
+    queryKey,
+    queryFn: () => {
+      console.log('📡 Query function executing');
+      return fetchFollowedStreams(accessToken, userId);
+    },
+    enabled: !skip && !!accessToken && !!userId,
+    staleTime: 0,
+    refetchInterval: 2 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    retry: 2,
+    initialData: [],
+    refetchOnMount: true,
+  });
+
+  // Update lastUpdated whenever streams data changes
   useEffect(() => {
-    async function loadStreams() {
-      if (disabled) {
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        setIsLoading(true);
-        const response = await fetchFollowedStreams(accessToken, userId);
-        setStreams(response.data);
-      } catch (err) {
-        console.error("Error loading streams:", err);
-        setError("Failed to load streams");
-      } finally {
-        setIsLoading(false);
-      }
+    if (!isFetching) {
+      setLastUpdated(new Date());
     }
+  }, [streams, isFetching]);
 
-    loadStreams();
-  }, [accessToken, userId, disabled]);
-
-  return { streams, isLoading, error };
+  return {
+    streams,
+    isLoading,
+    isFetching,
+    error: error?.message ?? null,
+    lastUpdated,
+  };
 } 
