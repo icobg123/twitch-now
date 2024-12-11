@@ -1,6 +1,6 @@
-import { ArrowUpDown, Gamepad, Users } from "lucide-react";
-import { useState } from "react";
-import type { FilterBy, SortBy } from "@src/hooks/useStreamFilters";
+import {ArrowUpDown, Gamepad, Users} from "lucide-react";
+import {useState} from "react";
+import type {FilterBy, SortBy} from "@src/hooks/useStreamFilters";
 
 type StreamsNavigationProps = {
   filterBy: FilterBy;
@@ -16,6 +16,12 @@ export function StreamsNavigation({
   setSortBy,
 }: StreamsNavigationProps) {
   const [isSortOpen, setIsSortOpen] = useState(false);
+
+  const handleSortChange = (newSortBy: SortBy) => {
+    console.log('Changing sort to:', newSortBy);
+    setSortBy(newSortBy);
+    setIsSortOpen(false);
+  };
 
   return (
     <footer className="btm-nav btm-nav-sm border-t border-base-300 bg-base-100">
@@ -46,9 +52,11 @@ export function StreamsNavigation({
           }`}
           onClick={() => setIsSortOpen(!isSortOpen)}
           onBlur={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-              setIsSortOpen(false);
-            }
+            setTimeout(() => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                setIsSortOpen(false);
+              }
+            }, 100);
           }}
           tabIndex={0}
         >
@@ -68,11 +76,7 @@ export function StreamsNavigation({
           <li>
             <button
               className={sortBy === "viewers-desc" ? "active !text-primary" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                setSortBy("viewers-desc");
-                setIsSortOpen(false);
-              }}
+              onClick={() => handleSortChange("viewers-desc")}
             >
               Viewers (High to Low)
             </button>
@@ -80,11 +84,7 @@ export function StreamsNavigation({
           <li>
             <button
               className={sortBy === "viewers-asc" ? "active !text-primary" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                setSortBy("viewers-asc");
-                setIsSortOpen(false);
-              }}
+              onClick={() => handleSortChange("viewers-asc")}
             >
               Viewers (Low to High)
             </button>
@@ -92,11 +92,7 @@ export function StreamsNavigation({
           <li>
             <button
               className={sortBy === "started" ? "active !text-primary" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                setSortBy("started");
-                setIsSortOpen(false);
-              }}
+              onClick={() => handleSortChange("started")}
             >
               Recently Started
             </button>
@@ -104,11 +100,7 @@ export function StreamsNavigation({
           <li>
             <button
               className={sortBy === "name" ? "active !text-primary" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                setSortBy("name");
-                setIsSortOpen(false);
-              }}
+              onClick={() => handleSortChange("name")}
             >
               Streamer Name
             </button>

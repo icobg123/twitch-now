@@ -1,13 +1,16 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useFollowedLiveStreams} from "@src/hooks/useFollowedLiveStreams";
 import {useTwitchAuth} from "@src/hooks/useTwitchAuth";
 
 export type SortOption = "viewers-desc" | "viewers-asc" | "started" | "name";
 export type FilterOption = "all" | "gaming";
 
+export type SortBy = "viewers-desc" | "viewers-asc" | "started" | "name";
+export type FilterBy = "all" | "gaming";
+
 export function useStreamFilters() {
-  const [sortBy, setSortBy] = useState<SortOption>("viewers-desc");
-  const [filterBy, setFilterBy] = useState<FilterOption>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("viewers-desc");
+  const [filterBy, setFilterBy] = useState<FilterBy>("all");
 
   const {
     accessToken,
@@ -26,43 +29,67 @@ export function useStreamFilters() {
     !accessToken || !userId
   );
 
+  useEffect(() => {
+    console.log('Sort/Filter changed:', { sortBy, filterBy });
+  }, [sortBy, filterBy]);
+
   const filteredAndSortedStreams = useMemo(() => {
-    const streams = data?.streams ?? [];
+    console.log('Sorting streams with:', { sortBy });
     
-    // First apply filters
+    const streams = data?.streams ?? [];
     let filtered = [...streams];
 
     if (filterBy === "gaming") {
-      filtered = filtered.filter(
-        (stream) =>
-          stream.game_name &&
-          ["Games", "Gaming", "Slots", "Casino", "Sports"].some((category) =>
-            stream.game_name.toLowerCase().includes(category.toLowerCase())
-          )
-      );
+      const beforeCount = filtered.length;
+      filtered = filtered.filter((stream) => {
+        const gameName = stream.game_name?.toLowerCase() ?? '';
+        const gamingCategories = [
+          'game',
+          'gaming',
+          'slots',
+          'casino',
+          'sports',
+          'rpg',
+          'fps',
+          'moba',
+          'simulator'
+        ];
+        return gamingCategories.some(category => 
+          gameName.includes(category)
+        );
+      });
+      console.log(`Filtered gaming streams: ${beforeCount} → ${filtered.length}`);
     }
 
     // Then sort
     return filtered.sort((a, b) => {
+      console.log('Sorting by:', sortBy);
       switch (sortBy) {
         case "viewers-desc":
-          return (b.viewer_count || 0) - (a.viewer_count || 0);
+          return (b.viewer_count ?? 0) - (a.viewer_count ?? 0);
         case "viewers-asc":
-          return (a.viewer_count || 0) - (b.viewer_count || 0);
+          return (a.viewer_count ?? 0) - (b.viewer_count ?? 0);
         case "started":
-          return (
-            new Date(b.started_at || 0).getTime() -
-            new Date(a.started_at || 0).getTime()
-          );
+          return new Date(b.started_at ?? 0).getTime() - 
+                 new Date(a.started_at ?? 0).getTime();
         case "name":
-          return (a.user_name || "")
-            .toLowerCase()
-            .localeCompare((b.user_name || "").toLowerCase());
+          return (a.user_name ?? "").toLowerCase()
+            .localeCompare((b.user_name ?? "").toLowerCase());
         default:
+          console.warn('Unknown sort option:', sortBy);
           return 0;
       }
     });
   }, [data?.streams, sortBy, filterBy]);
+
+  useEffect(() => {
+    console.log('Stream data changed:', {
+      streamCount: data?.streams?.length,
+      firstStream: data?.streams?.[0],
+      filterBy,
+      sortBy
+    });
+  }, [data?.streams, filterBy, sortBy]);
 
   return {
     sortBy,
