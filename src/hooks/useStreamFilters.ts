@@ -1,7 +1,6 @@
-import { useState, useMemo } from "react";
-import type { Stream } from "@src/lib/api/twitch";
-import { useFollowedLiveStreams } from "./useFollowedLiveStreams";
-import { useTwitchAuth } from "./useTwitchAuth";
+import {useMemo, useState} from "react";
+import {useFollowedLiveStreams} from "@src/hooks/useFollowedLiveStreams";
+import {useTwitchAuth} from "@src/hooks/useTwitchAuth";
 
 export type SortOption = "viewers-desc" | "viewers-asc" | "started" | "name";
 export type FilterOption = "all" | "gaming";
