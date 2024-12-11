@@ -6,7 +6,7 @@ import {storage} from "@src/lib/storage";
 export type SortOption = "viewers-desc" | "viewers-asc" | "started" | "name";
 export type FilterOption = "all" | "gaming";
 
-export type SortBy = "viewers-desc" | "viewers-asc" | "started" | "name";
+export type SortBy = "viewers-desc" | "viewers-asc" | "started" | "name-asc" | "name-desc";
 export type FilterBy = "all" | "gaming";
 
 const DEFAULT_SORT: SortBy = "viewers-desc";
@@ -106,9 +106,12 @@ export function useStreamFilters() {
         case "started":
           return new Date(b.started_at ?? 0).getTime() - 
                  new Date(a.started_at ?? 0).getTime();
-        case "name":
+        case "name-asc":
           return (a.user_name ?? "").toLowerCase()
             .localeCompare((b.user_name ?? "").toLowerCase());
+        case "name-desc":
+          return (b.user_name ?? "").toLowerCase()
+            .localeCompare((a.user_name ?? "").toLowerCase());
         default:
           return 0;
       }
