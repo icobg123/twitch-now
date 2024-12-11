@@ -1,4 +1,14 @@
-import {ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA, ArrowUpDown, Clock, Gamepad, Users} from "lucide-react";
+import {
+  ArrowDown01,
+  ArrowDown10,
+  ArrowDownAZ,
+  ArrowDownZA,
+  ArrowUpDown,
+  ClockArrowDown,
+  ClockArrowUp,
+  Gamepad,
+  Users,
+} from "lucide-react";
 import {useState} from "react";
 import type {FilterBy, SortBy} from "@src/hooks/useStreamFilters";
 
@@ -18,7 +28,7 @@ export function StreamsNavigation({
   const [isSortOpen, setIsSortOpen] = useState(false);
 
   const handleSortChange = (newSortBy: SortBy) => {
-    console.log('Changing sort to:', newSortBy);
+    console.log("Changing sort to:", newSortBy);
     setSortBy(newSortBy);
     setIsSortOpen(false);
   };
@@ -34,8 +44,10 @@ export function StreamsNavigation({
         return <ArrowDownAZ className="h-4 w-4" />;
       case "name-desc":
         return <ArrowDownZA className="h-4 w-4" />;
-      case "started":
-        return <Clock className="h-4 w-4" />;
+      case "started-desc":
+        return <ClockArrowDown className="h-4 w-4" />;
+      case "started-asc":
+        return <ClockArrowUp className="h-4 w-4" />;
       default:
         return <ArrowUpDown className="h-4 w-4" />;
     }
@@ -89,7 +101,9 @@ export function StreamsNavigation({
         >
           <li>
             <button
-              className={sortBy === "viewers-desc" ? "active !text-primary" : ""}
+              className={
+                sortBy === "viewers-desc" ? "active !text-primary" : ""
+              }
               onClick={() => handleSortChange("viewers-desc")}
             >
               <ArrowDown10 className="h-4 w-4" />
@@ -107,11 +121,22 @@ export function StreamsNavigation({
           </li>
           <li>
             <button
-              className={sortBy === "started" ? "active !text-primary" : ""}
-              onClick={() => handleSortChange("started")}
+              className={
+                sortBy === "started-desc" ? "active !text-primary" : ""
+              }
+              onClick={() => handleSortChange("started-desc")}
             >
-              <Clock className="h-4 w-4" />
-              Recently Started
+              <ClockArrowDown className="h-4 w-4" />
+              Duration (Recent)
+            </button>
+          </li>
+          <li>
+            <button
+              className={sortBy === "started-asc" ? "active !text-primary" : ""}
+              onClick={() => handleSortChange("started-asc")}
+            >
+              <ClockArrowUp className="h-4 w-4" />
+              Duration (Longest)
             </button>
           </li>
           <li>
@@ -136,4 +161,4 @@ export function StreamsNavigation({
       </div>
     </footer>
   );
-} 
+}
