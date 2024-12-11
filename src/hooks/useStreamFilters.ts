@@ -12,11 +12,17 @@ export type SortBy =
   | "started-desc" 
   | "started-asc" 
   | "name-asc" 
-  | "name-desc";
-export type FilterBy = "all" | "gaming";
+  | "name-desc"
+  | "game-viewers-desc"
+  | "game-viewers-asc"
+  | "game-channels-desc"
+  | "game-channels-asc"
+  | "game-name-asc"
+  | "game-name-desc";
+export type FilterBy = "live" | "games";
 
 const DEFAULT_SORT: SortBy = "viewers-desc";
-const DEFAULT_FILTER: FilterBy = "all";
+const DEFAULT_FILTER: FilterBy = "live";
 
 export function useStreamFilters() {
   const [sortBy, setSortBy] = useState<SortBy>(DEFAULT_SORT);
