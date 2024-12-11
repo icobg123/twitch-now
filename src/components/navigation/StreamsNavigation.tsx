@@ -145,7 +145,7 @@ export function StreamsNavigation({
           <span className="btm-nav-label text-xs">Sort</span>
         </button>
         <ul
-          className={`menu dropdown-content w-52 translate-y-[-0.5rem] rounded-box bg-base-100 p-2 shadow ${
+          className={`menu dropdown-content  translate-y-[-0.5rem] rounded-box bg-base-100 p-2 shadow gap-1 ${
             isSortTypeOpen ? "" : "hidden"
           }`}
           tabIndex={0}
@@ -199,7 +199,7 @@ export function StreamsNavigation({
           <span className="btm-nav-label text-xs">Order</span>
         </button>
         <ul
-          className={`menu dropdown-content w-52 translate-y-[-0.5rem] rounded-box bg-base-100 p-2 shadow ${
+          className={`menu dropdown-content  translate-y-[-0.5rem] rounded-box bg-base-100 p-2 shadow gap-1 ${
             isSortDirOpen ? "" : "hidden"
           }`}
           tabIndex={0}
@@ -210,7 +210,7 @@ export function StreamsNavigation({
               onClick={() => handleSortChange(getCurrentSortType(), "desc")}
             >
               {getSortDirIcon("desc", getCurrentSortType())}
-              Descending
+              Desc
             </button>
           </li>
           <li>
@@ -219,7 +219,7 @@ export function StreamsNavigation({
               onClick={() => handleSortChange(getCurrentSortType(), "asc")}
             >
               {getSortDirIcon("asc", getCurrentSortType())}
-              Ascending
+              Asc
             </button>
           </li>
         </ul>
