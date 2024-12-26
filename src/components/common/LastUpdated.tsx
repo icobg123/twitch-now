@@ -1,13 +1,11 @@
 type LastUpdatedProps = {
-  timestamp?: Date;
+  date: Date;
 };
 
-export function LastUpdated({ timestamp }: LastUpdatedProps) {
-  if (!timestamp) return null;
-  
+export function LastUpdated({ date }: LastUpdatedProps) {
   return (
-    <div className="text-center text-xs text-base-content/70">
-      Last updated: {new Date(timestamp).toLocaleTimeString()}
-    </div>
+    <p className="text-sm text-base-content/70">
+      Last updated: {date.toLocaleTimeString()}
+    </p>
   );
 } 

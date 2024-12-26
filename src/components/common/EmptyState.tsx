@@ -1,11 +1,11 @@
 type EmptyStateProps = {
   message: string;
-    lastUpdated?: Date;
+  lastUpdated?: Date;
 };
 
 export function EmptyState({ message, lastUpdated }: EmptyStateProps) {
   return (
-    <div className="flex h-full items-center justify-center p-4">
+    <div className="flex h-full items-center justify-center p-2">
       <div className="text-center text-base-content/70">
         <p>{message}</p>
         {lastUpdated && (
@@ -16,4 +16,4 @@ export function EmptyState({ message, lastUpdated }: EmptyStateProps) {
       </div>
     </div>
   );
-} 
+}
