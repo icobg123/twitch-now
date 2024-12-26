@@ -7,6 +7,7 @@ import {Header} from "@src/components/navigation/Header";
 import {FollowedStreamsView} from "@src/components/streams/FollowedStreamsView";
 import {StreamsNavigation} from "@src/components/navigation/StreamsNavigation";
 import {GroupedStreamsView} from "@src/components/grouped-streams/GroupedStreamsView";
+import {useCallback} from "react";
 
 export function Popup() {
     const {
@@ -30,25 +31,30 @@ export function Popup() {
         setSortBy,
         setFilterBy,
         lastUpdated: streamsLastUpdated,
-    } = useStreamFilters();
+    } = useStreamFilters(accessToken, userId);
 
-    // Handle errors - convert Error objects to strings
+    const handleRetry = useCallback(() => {
+        setError(null);
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
+    }, [setError]);
+
+    // Handle errors
     const errorMessage = authError || streamsError;
     if (errorMessage) {
         return (
             <div className="flex flex-col items-center gap-4 bg-base-200 p-6">
                 <div className="alert alert-error">
                     <AlertCircle className="h-6 w-6 shrink-0 stroke-current"/>
-                    <span>
-                        {errorMessage instanceof Error ? errorMessage.message : errorMessage}
-                    </span>
+                    <span>{errorMessage instanceof Error ? errorMessage.message : errorMessage}</span>
                 </div>
-                <button onClick={() => setError(null)} className="btn btn-primary btn-sm">
-                    Retry
-                </button>
+                <button onClick={handleRetry} className="btn btn-primary btn-sm">Retry</button>
             </div>
         );
     }
+
+    const safeStreams = Array.isArray(streams) ? streams : [];
 
     return (
         <div className="flex h-[600px] w-[400px] flex-col bg-base-200">
@@ -57,7 +63,7 @@ export function Popup() {
                 username={username}
                 isAuthLoading={isAuthLoading}
                 isAuthenticating={isAuthenticating}
-                streamsCount={streams.length}
+                streamsCount={safeStreams.length}
                 handleLogin={handleLogin}
                 handleLogout={handleLogout}
             />
@@ -74,10 +80,7 @@ export function Popup() {
                                                 Log in with your Twitch account
                                             </h2>
                                             <div className="space-y-2 text-base-content/70">
-                                                <p>
-                                                    Live streams from people you follow will show here once
-                                                    you're logged in.
-                                                </p>
+                                                <p>Live streams from people you follow will show here once you're logged in.</p>
                                                 <p>Use the button located in the upper right corner.</p>
                                             </div>
                                         </div>
@@ -88,13 +91,13 @@ export function Popup() {
                     ) : filterBy === "live" ? (
                         <FollowedStreamsView
                             isLoading={isStreamsLoading}
-                            streams={streams}
+                            streams={safeStreams}
                             lastUpdated={streamsLastUpdated}
                         />
                     ) : (
                         <GroupedStreamsView
                             isLoading={isStreamsLoading}
-                            streams={streams}
+                            streams={safeStreams}
                             lastUpdated={streamsLastUpdated}
                         />
                     )}
