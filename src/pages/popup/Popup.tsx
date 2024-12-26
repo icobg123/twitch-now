@@ -31,7 +31,7 @@ export function Popup() {
         setSortBy,
         setFilterBy,
         lastUpdated: streamsLastUpdated,
-    } = useStreamFilters(accessToken, userId);
+    } = useStreamFilters(accessToken, userId!);
 
     const handleRetry = useCallback(() => {
         setError(null);
@@ -68,7 +68,7 @@ export function Popup() {
                 handleLogout={handleLogout}
             />
             <main className="min-h-0 flex-1 overflow-y-auto">
-                <div className="pb-16">
+                <div className="pb-14">
                     {!accessToken ? (
                         <div className="flex h-full items-center justify-center px-4">
                             <div className="card max-w-sm bg-base-100 shadow-xl">

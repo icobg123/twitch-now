@@ -26,7 +26,7 @@ export function GroupedStreamsView({ streams, isLoading, lastUpdated }: Props) {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 p-2">
+      <div className="space-y-4 p-2 pb-0">
         {Array.from({ length: 3 }).map((_, i) => (
           <GameGroupSkeleton key={i} />
         ))}
@@ -47,7 +47,7 @@ export function GroupedStreamsView({ streams, isLoading, lastUpdated }: Props) {
   }
 
   return (
-    <div className="space-y-6 p-2">
+    <div className="space-y-4 p-2 pb-0">
       {Object.entries(groupedStreams).map(([gameName, gameStreams]) => (
         <div key={gameName} className="space-y-4">
           <GameHeader gameName={gameName} gameStreams={gameStreams} />
@@ -58,11 +58,7 @@ export function GroupedStreamsView({ streams, isLoading, lastUpdated }: Props) {
           </div>
         </div>
       ))}
-      {lastUpdated && (
-        <div className="pt-2">
-          <LastUpdated date={lastUpdated} />
-        </div>
-      )}
+      {lastUpdated && <LastUpdated date={lastUpdated} />}
     </div>
   );
 }

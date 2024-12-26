@@ -8,4 +8,4 @@ export function LastUpdated({ date }: LastUpdatedProps) {
       Last updated: {date.toLocaleTimeString()}
     </p>
   );
-} 
+}

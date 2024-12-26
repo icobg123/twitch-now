@@ -16,7 +16,7 @@ export function FollowedStreamsView({
 }: Props) {
   if (isLoading) {
     return (
-      <div className="space-y-4 p-2">
+      <div className="space-y-4 p-2 pb-0">
         {[1, 2, 3, 4, 5, 6].map((item) => (
           <StreamSkeleton key={item} />
         ))}
@@ -37,15 +37,11 @@ export function FollowedStreamsView({
   }
 
   return (
-    <div className="space-y-4 p-2">
+    <div className="space-y-4 p-2 pb-0">
       {streams.map((stream) => (
         <StreamCard key={stream.id} stream={stream} />
       ))}
-      {lastUpdated && (
-        <div className="pt-2">
-          <LastUpdated date={lastUpdated} />
-        </div>
-      )}
+      {lastUpdated && <LastUpdated date={lastUpdated} />}
     </div>
   );
 }

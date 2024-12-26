@@ -12,7 +12,7 @@ export function StreamSkeleton() {
 
 export function StreamListSkeleton() {
   return (
-    <div className="space-y-4 p-2">
+    <div className="space-y-4 p-2 pb-0">
       {Array.from({ length: 3 }).map((_, i) => (
         <StreamSkeleton key={i} />
       ))}
