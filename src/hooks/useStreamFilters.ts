@@ -31,7 +31,11 @@ export function useStreamFilters(accessToken: string | null, userId?: string) {
                     comparison = (b.viewer_count || 0) - (a.viewer_count || 0);
                     break;
                 case 'started':
-                    comparison = new Date(b.started_at).getTime() - new Date(a.started_at).getTime();
+                    // Calculate durations by comparing with current time
+                    const now = new Date().getTime();
+                    const aDuration = now - new Date(a.started_at).getTime();
+                    const bDuration = now - new Date(b.started_at).getTime();
+                    comparison = bDuration - aDuration;
                     break;
                 case 'name':
                     comparison = a.user_name.localeCompare(b.user_name);
