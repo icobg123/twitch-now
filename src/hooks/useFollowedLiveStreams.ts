@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchFollowedStreams, type Stream } from "@src/lib/api/twitch";
+import {useQuery} from "@tanstack/react-query";
+import {fetchFollowedStreams, type Stream} from "@src/lib/api/twitch";
 
 const CACHE_KEY = "followed-streams-cache";
 const CACHE_EXPIRY = 2 * 60 * 1000; // 2 minutes in milliseconds
@@ -61,7 +61,7 @@ export function useFollowedLiveStreams(
       const cached = getCache();
       return cached ? {
         streams: cached.streams,
-        lastUpdated: new Date(cached.lastUpdated)
+        lastUpdated: cached.lastUpdated
       } : undefined;
     },
     placeholderData: () => ({

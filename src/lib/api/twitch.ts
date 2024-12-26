@@ -9,6 +9,7 @@ export type Stream = {
   user_name: string;
   game_id: string;
   game_name: string;
+  game_box_art_url: string;
   type: string;
   title: string;
   viewer_count: number;
@@ -27,17 +28,23 @@ export type Game = {
   broadcaster_count?: number;
 };
 
-export async function fetchFollowedStreams(accessToken: string, userId: string): Promise<Stream[]> {
-  console.log('🚀 Fetching streams with:', { 
-    userId, 
-    hasAccessToken: !!accessToken 
+export async function fetchFollowedStreams(
+  accessToken: string,
+  userId: string
+): Promise<Stream[]> {
+  console.log("🚀 Fetching streams with:", {
+    userId,
+    hasAccessToken: !!accessToken,
   });
-  
+
   if (!accessToken || !userId) {
-    console.log('❌ Missing credentials:', { hasToken: !!accessToken, hasUserId: !!userId });
+    console.log("❌ Missing credentials:", {
+      hasToken: !!accessToken,
+      hasUserId: !!userId,
+    });
     return [];
   }
-  
+
   try {
     const response = await fetch(
       `https://api.twitch.tv/helix/streams/followed?user_id=${userId}`,
@@ -51,15 +58,21 @@ export async function fetchFollowedStreams(accessToken: string, userId: string):
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('❌ API Error:', errorData);
+      console.error("❌ API Error:", errorData);
       throw new Error(`Failed to fetch streams: ${errorData.message}`);
     }
 
     const data = await response.json();
-    console.log('✅ Streams fetched:', data);
-    return data.data;
+    
+    const streamsWithGameArt = data.data.map((stream: Stream) => ({
+      ...stream,
+      game_box_art_url: `https://static-cdn.jtvnw.net/ttv-boxart/${stream.game_id}-285x380.jpg`
+    }));
+
+    console.log("✅ Streams fetched:", streamsWithGameArt);
+    return streamsWithGameArt;
   } catch (error) {
-    console.error('❌ Fetch error:', error);
+    console.error("❌ Fetch error:", error);
     throw error;
   }
 }
@@ -109,10 +122,10 @@ export async function fetchFollowedGames(accessToken: string, userId: string) {
   }
 
   const followedData = await followedResponse.json();
-  
+
   // Get unique game IDs from live streams
   const streamsResponse = await fetch(
-    `${TWITCH_API_BASE}/streams?user_id=${followedData.data.map((f: any) => f.broadcaster_id).join('&user_id=')}`,
+    `${TWITCH_API_BASE}/streams?user_id=${followedData.data.map((f: any) => f.broadcaster_id).join("&user_id=")}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -127,10 +140,10 @@ export async function fetchFollowedGames(accessToken: string, userId: string) {
   }
 
   const streamsData = await streamsResponse.json();
-  
+
   // Get unique game IDs
   const gameIds = [...new Set(streamsData.data.map((s: Stream) => s.game_id))];
-  
+
   if (gameIds.length === 0) {
     return {
       games: [],
@@ -140,7 +153,7 @@ export async function fetchFollowedGames(accessToken: string, userId: string) {
 
   // Fetch game details
   const gamesResponse = await fetch(
-    `${TWITCH_API_BASE}/games?id=${gameIds.join('&id=')}`,
+    `${TWITCH_API_BASE}/games?id=${gameIds.join("&id=")}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -158,10 +171,15 @@ export async function fetchFollowedGames(accessToken: string, userId: string) {
 
   // Add viewer and broadcaster counts to each game
   const gamesWithStats = gamesData.data.map((game: Game) => {
-    const gameStreams = streamsData.data.filter((s: Stream) => s.game_id === game.id);
+    const gameStreams = streamsData.data.filter(
+      (s: Stream) => s.game_id === game.id
+    );
     return {
       ...game,
-      viewer_count: gameStreams.reduce((total: number, stream: Stream) => total + stream.viewer_count, 0),
+      viewer_count: gameStreams.reduce(
+        (total: number, stream: Stream) => total + stream.viewer_count,
+        0
+      ),
       broadcaster_count: gameStreams.length,
     };
   });
