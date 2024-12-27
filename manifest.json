@@ -35,7 +35,8 @@
   "host_permissions": [
     "https://api.twitch.tv/*",
     "https://id.twitch.tv/*",
-    "https://oauth.example.com/*"
+    "http://localhost:3000/*",
+    "https://icobg123.github.io/*"
   ],
   "browser_specific_settings": {
     "gecko": {

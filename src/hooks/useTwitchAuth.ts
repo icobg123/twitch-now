@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 import browser from "webextension-polyfill";
-import { TWITCH_CLIENT_ID } from "@src/lib/constants";
-import { fetchUserProfile } from "@src/lib/api/twitch";
+import {TWITCH_CLIENT_ID} from "@src/lib/constants";
+import {fetchUserProfile} from "@src/lib/api/twitch";
 
 const USER_CACHE_KEY = "twitch-user-cache";
 const USER_CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -39,6 +39,10 @@ function setUserCache(username: string, userId: string) {
   }
 }
 
+const REDIRECT_URI = process.env.NODE_ENV === 'production' 
+  ? "https://icobg123.github.io/streamerlens.github.io/auth/callback"
+  : "http://localhost:3000/auth/callback";
+
 export function useTwitchAuth() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
@@ -58,17 +62,23 @@ export function useTwitchAuth() {
       }
 
       const result = await browser.storage.local.get("twitchToken");
+      console.log("Stored token check:", result);
+
       if (result.twitchToken && typeof result.twitchToken === "string") {
+        console.log("Token found:", result.twitchToken.substring(0, 10) + "...");
         setAccessToken(result.twitchToken);
         
         // Try to get user data from cache first
         const cachedUser = getUserCache();
+        console.log("Cached user data:", cachedUser);
+        
         if (cachedUser) {
           setUsername(cachedUser.username);
           setUserId(cachedUser.userId);
         } else {
           // Fetch from API if cache miss or expired
           const profileData = await fetchUserProfile(result.twitchToken);
+          console.log("Profile data:", profileData);
           if (profileData.data && profileData.data.length > 0) {
             const user = profileData.data[0];
             setUsername(user.display_name);
@@ -76,10 +86,12 @@ export function useTwitchAuth() {
             setUserCache(user.display_name, user.id);
           }
         }
+      } else {
+        console.log("No token found in storage");
       }
     } catch (err) {
+      console.error("Token check error:", err);
       setError("Failed to load saved token");
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +111,7 @@ export function useTwitchAuth() {
       authUrl.searchParams.append("client_id", TWITCH_CLIENT_ID);
       authUrl.searchParams.append(
         "redirect_uri",
-        "https://oauth.example.com/callback"
+        REDIRECT_URI
       );
       authUrl.searchParams.append("scope", "user:read:follows user:read:email");
       authUrl.searchParams.append("state", state);
@@ -160,7 +172,7 @@ export function useTwitchAuth() {
       browser.webRequest.onBeforeRequest.addListener(
         listener,
         {
-          urls: ["https://oauth.example.com/callback*"],
+          urls: ["https://icobg123.github.io/streamerlens.github.io/auth/callback*"],
           types: ["main_frame"],
         },
         ["blocking"]

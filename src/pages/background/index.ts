@@ -1,5 +1,10 @@
 console.log("background script loaded");
 
+const REDIRECT_URLS = [
+  "http://localhost:3000/auth/callback*",
+  "https://icobg123.github.io/streamerlens.github.io/auth/callback*"
+];
+
 browser.webRequest.onBeforeRequest.addListener(
   async (details) => {
     const url = new URL(details.url);
@@ -10,7 +15,9 @@ browser.webRequest.onBeforeRequest.addListener(
       const accessToken = params.get('access_token');
       
       if (accessToken) {
+        console.log("Storing access token...");
         await browser.storage.local.set({ twitchToken: accessToken });
+        console.log("Access token stored successfully");
         return { cancel: true }; // Prevent the actual redirect
       }
     }
@@ -27,7 +34,7 @@ browser.webRequest.onBeforeRequest.addListener(
     return { cancel: false };
   },
   {
-    urls: ["https://oauth.example.com/callback*"],
+    urls: REDIRECT_URLS,
     types: ['main_frame']
   },
   ["blocking"]
